@@ -34,7 +34,9 @@ driver.find_element(By.ID,'login_submit').click()
 print('check1')
 #driver.findElement(By.linkText("List Accounts")).click();
 driver.implicitly_wait(3)
-driver.find_element_by_xpath('//*[@id="sectionManageAccounts"]/ul/li[2]/a').click()
+driver.find_element(By.XPATH, '//*[@id="sectionManageAccounts"]/ul/li[2]/a').click()
+driver.find_element(By.XPATH, '//*[@id="contentContainer"]/div[2]/div[4]/div[9]/a').click()
+
 print('done')
 
 #driver.close()
