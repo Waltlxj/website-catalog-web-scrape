@@ -15,19 +15,33 @@ payload = {
     'pass': config.password,
 }
 
-# driver_path = './chromedriver'
-# driver = webdriver.Chrome(executable_path = driver_path)
-
 
 def launchBrowser():
     s=Service('./chromedriver')
     driver = webdriver.Chrome(service=s)
-    driver.get('https://www.youtube.com/watch?v=j7VZsCCnptM')
     return driver
 
 driver = launchBrowser()
+driver.get('https://carleton.reclaimhosting.com:2087/')
+driver.maximize_window()
 
+# driver.findElement(By.id('user'));
+driver.find_element(By.ID,'user').send_keys(config.username)
+# driver.findElement(By.id("pass"))
+driver.find_element(By.ID,'pass').send_keys(config.password)
 # while(True):
+driver.find_element(By.ID,'login_submit').click()
+print('check1')
+#driver.findElement(By.linkText("List Accounts")).click();
+driver.implicitly_wait(3)
+driver.find_element_by_xpath('//*[@id="sectionManageAccounts"]/ul/li[2]/a').click()
+print('done')
+
+#driver.close()
+
+
+#driver.find_element_by_partial_link_text('List Accounts')
+
 #     pass
 
 # with requests.session() as s:
