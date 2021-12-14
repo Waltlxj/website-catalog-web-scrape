@@ -12,12 +12,31 @@ from bs4 import BeautifulSoup
 # }
 
 
-def launchBrowser():
+def launch_browser():
     s=Service('./chromedriver')
     driver = webdriver.Chrome(service=s)
     return driver
 
-driver = launchBrowser()
+def get_sub_domains(driver):
+    driver.find_element(By.XPATH, '//*[@id="icon-domains"]').click()
+    domain_table = driver.find_element(By.ID, 'domainItemLister_items_table')
+    subdomain_string = ''
+    for domain_row in domain_table.find_elements(By.CSS_SELECTOR, 'tr'):
+        domain_counter = 0
+        for domain_cell in domain_row.find_elements(By.TAG_NAME, 'td'):
+            # print(domain_cell.text, domain_counter)
+            #
+            if domain_counter == 1 and 'Main Domain' not in domain_cell.text:
+                subdomain_string = subdomain_string + '   ' + domain_cell.text
+                # print(subdomain_string, domain_counter)
+            domain_counter += 1
+    subdomain_string = subdomain_string.strip()
+    if not subdomain_string:
+        subdomain_string = 'None'
+        # print(subdomain_string)
+    return subdomain_string
+
+driver = launch_browser()
 driver.get('https://carleton.reclaimhosting.com:2087/')
 driver.maximize_window()
 parent = driver.window_handles[0]
@@ -49,20 +68,12 @@ for row in main_table.find_elements(By.CSS_SELECTOR, 'tr'):
             # actions in cell go here!
 
             # Gets list of sub domains of a given domain
-            driver.find_element(By.XPATH, '//*[@id="icon-domains"]').click()
-            domain_table = driver.find_element(By.ID, 'domainItemLister_items_table')
-            for domain_row in domain_table.find_elements(By.CSS_SELECTOR, 'tr'):
-                domain_counter = 0
-                subdomain_string = ''
-                for domain_cell in domain_row.find_elements(By.TAG_NAME, 'td'):
-                    # print(domain_cell.text, domain_counter)
-                    if domain_counter == 1 and 'Main Domain' not in domain_cell.text:
-                        subdomain_string = subdomain_string + domain_cell.text + '   '
-                    domain_counter += 1
-                subdomain_string = subdomain_string.strip()
-                if not subdomain_string:
-                    subdomain_string = 'None'
-                print(subdomain_string)
+
+            subdomain_string = get_sub_domains(driver)
+            print(subdomain_string)
+            driver.execute_script("window.history.go(-1)")
+
+
 
 
 
