@@ -2,6 +2,7 @@ import config
 import requests
 import os
 import time
+import csv
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -24,9 +25,9 @@ def get_sub_domains(driver):
     # goes to domains page under cpanel
     try:
         element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, '//*[@id="domains-body"]/div/div[2]')))
+        EC.presence_of_element_located((By.ID, 'item_domains')))
     finally:
-        driver.find_element(By.XPATH, '//*[@id="domains-body"]/div/div[2]').click()
+        driver.find_element(By.ID, 'item_domains').click()
 
     # gets table of domains
     try:
@@ -64,9 +65,9 @@ def get_apps(driver):
     # goes to myApps page
     try:
         element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, '//*[@id="item_myapps"]')))
+        EC.presence_of_element_located((By.ID, 'item_myapps')))
     finally:
-        driver.find_element(By.XPATH, '//*[@id="item_myapps"]').click()
+        driver.find_element(By.ID, 'item_myapps').click()
 
     try:
         element = WebDriverWait(driver, 10).until(
@@ -101,11 +102,37 @@ def get_backups(driver):
     return backup_count
 
 
+def get_value_href(driver, path):
+    value = ''
+    try:
+        element = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, path)))
+    finally:
+        value = driver.find_element(By.XPATH, path).get_attribute('href')
+    return value
+    # print(value)
+
+
+def get_value(driver, path):
+    value = ''
+    try:
+        element = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.XPATH, path)))
+    finally:
+        value = driver.find_element(By.XPATH, path).text
+    return value
+    # print(value)
+
+
+
 def main():
     driver = launch_browser()
     driver.get('https://carleton.reclaimhosting.com:2087/')
     driver.maximize_window()
     parent = driver.window_handles[0]
+
+    domain_data = []
+    filename = 'domain_data.csv'
 
     # driver.findElement(By.id('user'));
     driver.find_element(By.ID,'user').send_keys(config.username)
@@ -131,57 +158,46 @@ def main():
 
     main_row_counter = 0
     for row in main_table.find_elements(By.CSS_SELECTOR, 'tr'):
+        # curr_row_data = []
+        domain_url = ''
+        username = ''
+        email = ''
+        quota = ''
+        disk = ''
+        domain_count = ''
+        subdomain_string = ''
+        app_count = ''
+        app_string = ''
+        backup_count = ''
+
         main_cell_counter = 0
+
         for cell in row.find_elements(By.TAG_NAME, 'td'):
             if main_cell_counter == 1:
-                domain_url = ''
                 domain_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[2]/a'
-                try:
-                    element = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH, domain_xpath)))
-                finally:
-                    domain_url = driver.find_element(By.XPATH, domain_xpath).get_attribute('href')
-                # print(domain_url)
+                domain_url = get_value_href(driver, domain_xpath)
+                # curr_row_data.append(domain_url)
 
             elif main_cell_counter == 4:
-                username = ''
                 username_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[5]'
-                try:
-                    element = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH, username_xpath)))
-                finally:
-                    username = driver.find_element(By.XPATH, username_xpath).text
+                username = get_value(driver, username_xpath)
                 # print(username)
+                # curr_row_data.append(username)
 
             elif main_cell_counter == 5:
-                email = ''
                 email_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[6]/a'
-                try:
-                    element = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH, email_xpath)))
-                finally:
-                    email = driver.find_element(By.XPATH, email_xpath).text
-                # print(email)
+                email = get_value(driver, email_xpath)
+                # curr_row_data.append(email)
 
             elif main_cell_counter == 8:
-                quota = ''
                 quota_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[9]/span[2]'
-                try:
-                    element = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH, quota_xpath)))
-                finally:
-                    quota = driver.find_element(By.XPATH, quota_xpath).text
-                # print(quota)
+                quota = get_value(driver, quota_xpath)
+                # curr_row_data.append(quota)
 
             elif main_cell_counter == 9:
-                disk = ''
                 disk_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[10]/span[2]'
-                try:
-                    element = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH, disk_xpath)))
-                finally:
-                    disk = driver.find_element(By.XPATH, disk_xpath).text
-                # print(disk)
+                disk = get_value(driver, disk_xpath)
+                # curr_row_data.append(disk)
 
             elif main_cell_counter == 2:
                 cpanel_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[3]/form'
@@ -199,23 +215,45 @@ def main():
                 # Gets list of sub domains of a given domain
 
 
-                    # subdomain_string = get_sub_domains(driver)
+                    subdomain_string = get_sub_domains(driver)
+                    domain_count = subdomain_string[0: subdomain_string.find('     ')]
+                    subdomain_string = subdomain_string[subdomain_string.find('     '):].strip(' ')
+                    # curr_row_data.append(domain_count)
+                    # curr_row_data.append(subdomain_string)
+                    # print('sub count: ', domain_count)
                     # print('sub domains: ', subdomain_string)
-                    #
-                    # app_string = get_apps(driver)
+
+                    app_string = get_apps(driver)
+                    app_count = app_string[0: app_string.find('     ')]
+                    app_string = app_string[app_string.find('     '):].strip(' ')
+                    # curr_row_data.append(app_count)
+                    # curr_row_data.append(app_string)
                     # print('apps: ', app_string)
-                    #
-                    # backup_count = get_backups(driver)
+
+                    backup_count = get_backups(driver)
+                    # curr_row_data.append(backup_count)
                     # print('backup: ' , backup_count)
 
                     driver.close()
                     driver.switch_to.window(parent)
 
-
             main_cell_counter += 1
         main_row_counter += 1
+        curr_row_data = [domain_url, username, email, quota, disk, domain_count, subdomain_string, app_count, app_string, backup_count]
+        print(curr_row_data)
+        domain_data.append(curr_row_data)
 
-    #driver.quit()
+
+    driver.quit()
+
+    domain_data.pop(0)
+    label_row = ['domain url', 'username', 'email', 'quota', 'disk space', 'domain count', 'sub domain(s)', 'app count', 'app(s)', 'backup count']
+    domain_data.insert(0, label_row)
+
+    with open(filename, 'w') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerows(domain_data)
+
 
 if __name__ == '__main__':
     main()
