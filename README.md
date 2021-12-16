@@ -16,10 +16,10 @@ Web drivers: https://chromedriver.storage.googleapis.com/index.html
 
 
 CONFIG.PY:
-create a file called config.py. This will contain log information for the web scraper. You can copy-paste the format below.
+create a file called config.py. This will contain log in information for the web scraper. You can copy-paste the format below. Create your own config.py locally with your own username and password.
 
-uesername = 'username'
-password = 'password'
+uesername = [root username]
+password = [root password]
 
 
 
