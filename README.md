@@ -7,7 +7,7 @@ requests
 
 
 WEB DRIVER:
-By default the web driver I installed was for an m1 mac running chrome 96.0.4664.45. If you are running on a different type of computer or different version of chrome, download the correct web driver and put it in the same directory as scaper.py. edit the launch_browser method so that it will access the correct web driver.
+By default the web driver I installed was for an m1 mac running chrome 96.0.4664.45. If you are running on a different type of computer or different version of chrome, download the correct web driver and put it in the same directory as scaper.py. edit the launch_browser method so that it will access the correct web driver. Do this by changing the driver name in line 15 to "./[driver name]".
 
 Your chrome version: chrome://version/
 
