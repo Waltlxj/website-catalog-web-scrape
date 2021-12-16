@@ -233,7 +233,7 @@ def main():
 
     #first row of domain_data is blank so it is removed and lable row is added
     domain_data.pop(0)
-    label_row = ['domain url', 'username', 'email', 'quota', 'disk space', 'domain count', 'sub domain(s)', 'app count', 'app(s)', 'backup count']
+    label_row = ['domain url', 'username', 'email', 'quota', 'disk space', 'sub domain count', 'sub domain(s)', 'app count', 'app(s)', 'backup count']
     domain_data.insert(0, label_row)
 
     #writes to csv file
