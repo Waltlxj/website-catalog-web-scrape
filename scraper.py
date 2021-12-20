@@ -1,7 +1,5 @@
 import config
 import requests
-import os
-import time
 import csv
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -10,7 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-# lauches the webdriver. if using different diver change in line 15.
+# lauches the webdriver. if using different diver change in line 's=Service('./chromedriver')'.
 def launch_browser():
     s=Service('./chromedriver')
     driver = webdriver.Chrome(service=s)
