@@ -1,4 +1,14 @@
 # website-catalog-web-scrape
+12/20/2021
+By: Jared Chen 2023
+For: Em Palencia
+
+
+
+SUMMARY:
+When scraper.py is run, it will sign into Carleton Colleges WHM page and scrape domain information. While the scraper is running, it will print out some information about the domain it is currently parseing, this is just so you know the program hasn't crashed yet. When the scraper is finished running, it will place that information into a csv file for easy viewing.
+
+
 
 LIBRARIES (pip3 install [library]):
 selenium
@@ -20,8 +30,3 @@ create a file called config.py. This will contain log in information for the web
 
 username = [root username]
 password = [root password]
-
-
-
-SUMMARY:
-When scraper.py is run, it will sign into Carleton Colleges WHM page and scrape domain information. While the scraper is running, it will print out some information about the domain it is currently parseing, this is just so you know the program hasn't crashed yet. When the scraper is finished running, it will place that information into a csv file for easy viewing.
