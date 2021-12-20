@@ -5,8 +5,12 @@ For: Em Palencia
 
 
 
+This code is to get Reclaim cPanel and Site Ownership Information.
+
+
+
 SUMMARY:
-When scraper.py is run, it will sign into Carleton Colleges WHM page and scrape domain information. While the scraper is running, it will print out some information about the domain it is currently parseing, this is just so you know the program hasn't crashed yet. When the scraper is finished running, it will place that information into a csv file for easy viewing.
+When scraper.py is run, it will sign into Carleton Colleges WHM page and scrape domain information. While the scraper is running, it will print out some information about the domain it is currently parsing, this is just so you know the program hasn't crashed yet. When the scraper is finished running, it will place that information into a csv file for easy viewing.
 
 
 
