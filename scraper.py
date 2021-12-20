@@ -146,7 +146,7 @@ def main():
         EC.presence_of_element_located((By.XPATH, '//*[@id="contentContainer"]/div[2]/div[4]/div[9]/a')))
     finally:
         driver.find_element(By.XPATH, '//*[@id="contentContainer"]/div[2]/div[4]/div[9]/a').click()
-    # main_table represents the table of accounts
+    # main_table represents the table of accounts, containing all domains on the whm site.
     main_table = []
     try:
         element = WebDriverWait(driver, 10).until(
@@ -190,18 +190,19 @@ def main():
                 disk_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[10]/span[2]'
                 disk = get_value(driver, disk_xpath)
 
+            #This is the cpanel cell, and since there is a lot of information in the cpanel, there are a lot of
+            #operations in order to get necessary information
             elif main_cell_counter == 2:
                 cpanel_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[3]/form'
+                #navigate to cpanel page
                 try:
                     element = WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.XPATH, cpanel_xpath)))
                 finally:
                     driver.find_element(By.XPATH, cpanel_xpath).click()
-
+                    #child is set so afterwards, cpanel tab can be closed
                     child = driver.window_handles[1]
                     driver.switch_to.window(child)
-
-                    # actions in cell go here! 89
 
                     # Gets list of sub domains of a given domain
                     subdomain_string = get_sub_domains(driver)
