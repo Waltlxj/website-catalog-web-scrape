@@ -1,3 +1,4 @@
+from nis import cat
 import config
 import requests
 import csv
@@ -127,25 +128,26 @@ def main():
     driver.maximize_window()
     parent = driver.window_handles[0]
 
-    # global variables used to write to cs file
-    domain_data = []
+    # global variables used to write to csv file
+    #domain_data = []
     filename = 'domain_data.csv'
 
     # logs in
     driver.find_element(By.ID,'user').send_keys(config.username)
     driver.find_element(By.ID,'pass').send_keys(config.password)
     driver.find_element(By.ID,'login_submit').click()
-    # nagivate to accounts page and display all accounts
+    # nagivate to accounts page
     try:
         element = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.XPATH, '//*[@id="sectionManageAccounts"]/ul/li[2]/a')))
     finally:
         driver.find_element(By.XPATH, '//*[@id="sectionManageAccounts"]/ul/li[2]/a').click()
+    # click "ALL" to show all accounts on one page
     try:
         element = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.XPATH, '//*[@id="contentContainer"]/div[2]/div[4]/div[9]/a')))
+        EC.presence_of_element_located((By.XPATH, '//*[@id="contentContainer"]/div[2]/div[4]/div[10]/a')))
     finally:
-        driver.find_element(By.XPATH, '//*[@id="contentContainer"]/div[2]/div[4]/div[9]/a').click()
+        driver.find_element(By.XPATH, '//*[@id="contentContainer"]/div[2]/div[4]/div[10]/a').click()
     # main_table represents the table of accounts, containing all domains on the whm site.
     main_table = []
     try:
@@ -154,91 +156,100 @@ def main():
     finally:
         main_table = driver.find_element(By.ID, 'listaccts')
 
-    main_row_counter = 0
-    for row in main_table.find_elements(By.CSS_SELECTOR, 'tr'):
-        domain_url = ''
-        username = ''
-        email = ''
-        quota = ''
-        disk = ''
-        domain_count = ''
-        subdomain_string = ''
-        app_count = ''
-        app_string = ''
-        backup_count = ''
+    print(main_table)
 
-        main_cell_counter = 0
+    with open(filename, 'w') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(['domain url', 'username', 'email', 'quota', 'disk space', 'sub domain count', 'sub domain(s)', 'app count', 'app(s)', 'backup count'])
 
-        for cell in row.find_elements(By.TAG_NAME, 'td'):
-            if main_cell_counter == 1:
-                domain_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[2]/a'
-                domain_url = get_value_href(driver, domain_xpath)
+        main_row_counter = 0 # Use enumerate()
+        for row in main_table.find_elements(By.CSS_SELECTOR, 'tr'):
+            domain_url = ''
+            username = ''
+            email = ''
+            quota = ''
+            disk = ''
+            domain_count = ''
+            subdomain_string = ''
+            app_count = ''
+            app_string = ''
+            backup_count = ''
 
-            elif main_cell_counter == 4:
-                username_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[5]'
-                username = get_value(driver, username_xpath)
+            '''
+            For loop unnecessary
+            '''
+            main_cell_counter = 0
 
-            elif main_cell_counter == 5:
-                email_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[6]/a'
-                email = get_value(driver, email_xpath)
+            for cell in row.find_elements(By.TAG_NAME, 'td'):
+                if main_cell_counter == 1:
+                    domain_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[2]/a'
+                    domain_url = get_value_href(driver, domain_xpath)
 
-            elif main_cell_counter == 8:
-                quota_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[9]/span[2]'
-                quota = get_value(driver, quota_xpath)
+                elif main_cell_counter == 4:
+                    username_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[5]'
+                    username = get_value(driver, username_xpath)
 
-            elif main_cell_counter == 9:
-                disk_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[10]/span[2]'
-                disk = get_value(driver, disk_xpath)
+                elif main_cell_counter == 5:
+                    email_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[6]/a'
+                    email = get_value(driver, email_xpath)
 
-            #This is the cpanel cell, and since there is a lot of information in the cpanel, there are a lot of
-            #operations in order to get necessary information
-            elif main_cell_counter == 2:
-                cpanel_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[3]/form'
-                #navigate to cpanel page
-                try:
-                    element = WebDriverWait(driver, 10).until(
-                    EC.presence_of_element_located((By.XPATH, cpanel_xpath)))
-                finally:
-                    driver.find_element(By.XPATH, cpanel_xpath).click()
-                    #child is set so afterwards, cpanel tab can be closed
-                    child = driver.window_handles[1]
-                    driver.switch_to.window(child)
+                elif main_cell_counter == 8:
+                    quota_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[9]/span[2]'
+                    quota = get_value(driver, quota_xpath)
 
-                    # Gets list of sub domains of a given domain
-                    subdomain_string = get_sub_domains(driver)
-                    domain_count = subdomain_string[0: subdomain_string.find('     ')]
-                    subdomain_string = subdomain_string[subdomain_string.find('     '):].strip(' ')
+                elif main_cell_counter == 9:
+                    disk_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[10]/span[2]'
+                    disk = get_value(driver, disk_xpath)
 
-                    #get list of applications
-                    app_string = get_apps(driver)
-                    app_count = app_string[0: app_string.find('     ')]
-                    app_string = app_string[app_string.find('     '):].strip(' ')
+                #This is the cpanel cell, and since there is a lot of information in the cpanel, there are a lot of
+                #operations in order to get necessary information
+                elif main_cell_counter == 2:
+                    cpanel_xpath = '//*[@id="listaccts"]/tbody/tr[' + str(main_row_counter) + ']/td[3]/form'
+                    #navigate to cpanel page
+                    try:
+                        element = WebDriverWait(driver, 10).until(
+                        EC.presence_of_element_located((By.XPATH, cpanel_xpath)))
+                    finally:
+                        try:
+                            driver.find_element(By.XPATH, cpanel_xpath).click()
+                            #child is set so afterwards, cpanel tab can be closed
+                            child = driver.window_handles[1]
+                            driver.switch_to.window(child)
 
-                    #gets number of backups
-                    backup_count = get_backups(driver)
+                            # Gets list of sub domains of a given domain
+                            subdomain_string = get_sub_domains(driver)
+                            domain_count = subdomain_string[0: subdomain_string.find('     ')]
+                            subdomain_string = subdomain_string[subdomain_string.find('     '):].strip(' ')
 
-                    #closes current window to prep to open next cpanel
-                    driver.close()
-                    driver.switch_to.window(parent)
+                            #get list of applications
+                            app_string = get_apps(driver)
+                            app_count = app_string[0: app_string.find('     ')]
+                            app_string = app_string[app_string.find('     '):].strip(' ')
 
-            main_cell_counter += 1
-        main_row_counter += 1
-        curr_row_data = [domain_url, username, email, quota, disk, domain_count, subdomain_string, app_count, app_string, backup_count]
-        print(curr_row_data)
-        domain_data.append(curr_row_data)
+                            #gets number of backups
+                            backup_count = get_backups(driver)
+                        except:
+                            print("An error occured at", domain_url)
+                            csvwriter.writerow([domain_url, 'ERROR!!!!'])
+
+                        #closes current window to prep to open next cpanel
+                        driver.close()
+                        driver.switch_to.window(parent)
+
+
+                main_cell_counter += 1
+
+
+            main_row_counter += 1
+
+            curr_row_data = [domain_url, username, email, quota, disk, domain_count, subdomain_string, app_count, app_string, backup_count]
+            print(curr_row_data)
+            # write to csv
+            csvwriter.writerow(curr_row_data)
 
 
     driver.quit()
 
-    #first row of domain_data is blank so it is removed and lable row is added
-    domain_data.pop(0)
-    label_row = ['domain url', 'username', 'email', 'quota', 'disk space', 'sub domain count', 'sub domain(s)', 'app count', 'app(s)', 'backup count']
-    domain_data.insert(0, label_row)
-
-    #writes to csv file
-    with open(filename, 'w') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerows(domain_data)
 
 
 if __name__ == '__main__':

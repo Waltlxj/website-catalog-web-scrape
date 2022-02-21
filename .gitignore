@@ -1,2 +1,4 @@
 /config.py
 /domain_data.csv
+__pycache__/
+output.csv
