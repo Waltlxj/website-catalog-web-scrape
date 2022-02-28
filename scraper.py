@@ -156,7 +156,7 @@ def main():
     finally:
         main_table = driver.find_element(By.ID, 'listaccts')
 
-    print(main_table)
+    # print(main_table)
 
     with open(filename, 'w') as csvfile:
         csvwriter = csv.writer(csvfile)
@@ -212,9 +212,16 @@ def main():
                     finally:
                         try:
                             driver.find_element(By.XPATH, cpanel_xpath).click()
+
                             #child is set so afterwards, cpanel tab can be closed
                             child = driver.window_handles[1]
                             driver.switch_to.window(child)
+
+                            # deals with pop up message if any
+                            try:
+                                driver.find_element(By.ID, 'cp-modalDismiss').click()
+                            except:
+                                pass
 
                             # Gets list of sub domains of a given domain
                             subdomain_string = get_sub_domains(driver)
