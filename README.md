@@ -16,7 +16,7 @@ When scraper.py is run, it will sign into Carleton Colleges WHM page and scrape 
  `pip3 install selenium`\
  `pip3 install requests`
 
-### 3. Download this repo
+### 3. Download this repo (Code > Download ZIP)
 
 ### 4. WEB DRIVER
 You need to find the webdriver that matches your Chrome version. Check your chrome version and download the matching Chrome driver here.
