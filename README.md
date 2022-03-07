@@ -9,25 +9,31 @@ For: Em Palencia
 ## Summary
 When scraper.py is run, it will sign into Carleton Colleges WHM page and scrape domain information. While the scraper is running, it will print out some information about the domain it is currently parsing, this is just so you know the program hasn't crashed yet. When the scraper is finished running, it will place that information into a csv file for easy viewing.
 
-## Dependencies
+## How to run the program
+### 1. Make sure you have Python on your machine
 
-### LIBRARIES  
- `pip3 install [library]`:  
-selenium  
-requests
+### 2. Install the two LIBRARIES below by executing the two commands
+ `pip3 install selenium`\
+ `pip3 install requests`
 
-### WEB DRIVER
-By default the web driver I installed was for an m1 mac running chrome 96.0.4664.45. If you are running on a different type of computer or different version of chrome, download the correct web driver and put it in the same directory as scaper.py. edit the launch_browser method so that it will access the correct web driver. Do this by changing the driver name in line 15 to "./[driver name]".
+### 3. Download this repo
 
-Your chrome version: chrome://version/
+### 4. WEB DRIVER
+You need to find the webdriver that matches your Chrome version. Check your chrome version and download the matching Chrome driver here.
 
-Web drivers: https://chromedriver.storage.googleapis.com/index.html
+Web drivers: https://chromedriver.storage.googleapis.com/index.html 
 
+Replace the webdriver in this folder with the webdriver you just downloaded. 
 
-
-### CONFIG.PY
-create a file called config.py. This will contain log in information for the web scraper. You can copy-paste the format below. Create your own config.py locally with your own username and password.
+### 5. Create CONFIG.PY
+create a file called `config.py`. This will contain log in information for cPanel. You can copy-paste the format below into config.py, and replace your_username and your_password with the actual thing, please keep the `''`.
 ```
-username = [root username]
-password = [root password]
+username = 'your_username'
+password = 'your password'
+```
+
+### 6. Run the program
+Navigate your command/terminal to the folder where you have the code. Use the following command the run the program. 
+```
+python3 scraper.py
 ```
